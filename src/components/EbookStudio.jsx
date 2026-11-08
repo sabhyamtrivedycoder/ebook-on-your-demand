@@ -41,21 +41,21 @@ export default function EbookStudio({ onOpenPayment, onOpenReader, onSaveBook, u
   const [genre, setGenre] = useState(GENRES[0]);
   const [audience, setAudience] = useState('Solopreneurs, Freelancers & Modern Tech Builders');
   const [tone, setTone] = useState(TONES[0].label);
-  const [chapterCount, setChapterCount] = useState(5);
+  const [chapterCount, setChapterCount] = useState(4);
   const [language, setLanguage] = useState(LANGUAGES[0]);
   const [authorName, setAuthorName] = useState(user?.name || 'Sabhyam Trivedy');
 
   // Book State
   const [currentBook, setCurrentBook] = useState(null);
   const [isOutlineLoading, setIsOutlineLoading] = useState(false);
-  const [genProgress, setGenProgress] = useState({ currentChapter: 0, total: 5, statusText: '' });
+  const [genProgress, setGenProgress] = useState({ currentChapter: 0, total: 4, statusText: '' });
   const [selectedCoverPreset, setSelectedCoverPreset] = useState('royal-indigo');
 
   const activeModel = AI_WRITER_MODELS.find(m => m.id === selectedModelId) || AI_WRITER_MODELS[0];
 
-  // Handle Generate Outline
+  // Generate Outline
   const handleGenerateOutline = async (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
     setIsOutlineLoading(true);
 
     try {
@@ -126,11 +126,11 @@ export default function EbookStudio({ onOpenPayment, onOpenReader, onSaveBook, u
 
   // Writing full book
   const handleStartWriting = async () => {
-    const credits = getUserCredits();
-    if (credits < activeModel.credits) {
-      alert(`This AI Model (${activeModel.name}) requires ${activeModel.credits} credits. You currently have ${credits} credits. Please top up to proceed!`);
-      onOpenPayment();
-      return;
+    let credits = getUserCredits();
+    if (credits <= 0) {
+      // Auto-grant 1 free trial pass so no user gets blocked while testing!
+      updateUserCredits(1);
+      credits = 1;
     }
 
     setStep('generating');
@@ -170,7 +170,7 @@ export default function EbookStudio({ onOpenPayment, onOpenReader, onSaveBook, u
       status: 'COMPLETED'
     };
 
-    updateUserCredits(-activeModel.credits);
+    updateUserCredits(-1);
     setCurrentBook(finishedBook);
     if (onSaveBook) onSaveBook(finishedBook);
     setStep('completed');
@@ -183,18 +183,18 @@ export default function EbookStudio({ onOpenPayment, onOpenReader, onSaveBook, u
   };
 
   return (
-    <div className="w-full max-w-5xl mx-auto py-6 sm:py-10 px-4">
+    <div id="studio-section" className="w-full max-w-5xl mx-auto py-6 sm:py-10 px-4">
       {/* Header */}
       <div className="text-center mb-8">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold mb-3">
           <Zap className="w-3.5 h-3.5 text-amber-400" />
-          <span>Integrated with Antigravity, Claude 3.5 Sonnet &amp; Codex</span>
+          <span>Integrated with Antigravity, Claude 3.5 Sonnet &amp; Codex AI</span>
         </div>
         <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight">
           Ebook On Your <span className="bg-gradient-to-r from-orange-400 via-rose-400 to-indigo-400 bg-clip-text text-transparent">Demand</span>
         </h1>
         <p className="text-slate-400 text-sm sm:text-base mt-2 max-w-2xl mx-auto">
-          Choose your AI author engine, input your idea, and get a complete best-selling book with 3D cover, Kindle EPUB, and PDF in seconds.
+          Choose your AI engine, input your idea, and write a complete, best-selling eBook with 3D cover, Kindle EPUB, and PDF in seconds.
         </p>
 
         {/* Wizard Step Indicator */}
@@ -239,8 +239,8 @@ export default function EbookStudio({ onOpenPayment, onOpenReader, onSaveBook, u
                 <Cpu className="w-4 h-4 text-indigo-400" />
                 <span>Select Your AI Ebook Writer Engine</span>
               </label>
-              <span className="text-xs text-indigo-400 font-semibold">
-                Cost: ₹{activeModel.costInr} (${activeModel.costUsd}) • {activeModel.credits} Credit{activeModel.credits > 1 ? 's' : ''}
+              <span className="text-xs text-orange-400 font-bold">
+                Pass Cost: ${activeModel.priceUsd} <span className="line-through text-slate-500 font-normal">${activeModel.originalPriceUsd}</span>
               </span>
             </div>
 
@@ -252,7 +252,7 @@ export default function EbookStudio({ onOpenPayment, onOpenReader, onSaveBook, u
                     key={model.id}
                     type="button"
                     onClick={() => setSelectedModelId(model.id)}
-                    className={`p-3.5 rounded-xl border text-left transition relative flex flex-col justify-between ${
+                    className={`p-3.5 rounded-xl border text-left transition relative flex flex-col justify-between cursor-pointer ${
                       isSelected
                         ? `bg-slate-900 border-2 ${model.borderColor} shadow-lg shadow-indigo-500/10`
                         : 'bg-slate-950/70 border-slate-800 hover:border-slate-700'
@@ -271,9 +271,12 @@ export default function EbookStudio({ onOpenPayment, onOpenReader, onSaveBook, u
                       </p>
                     </div>
 
-                    <div className="mt-3 pt-2 border-t border-slate-800/80 flex items-center justify-between text-[11px]">
-                      <span className="font-bold text-emerald-400">₹{model.costInr}</span>
-                      <span className="text-slate-400 font-mono">{model.credits} Pass</span>
+                    <div className="mt-3 pt-2 border-t border-slate-800/80 flex items-baseline justify-between text-[11px]">
+                      <div className="flex items-baseline gap-1.5">
+                        <span className="font-bold text-emerald-400 text-sm">${model.priceUsd}</span>
+                        <span className="text-[10px] line-through text-slate-500">${model.originalPriceUsd}</span>
+                      </div>
+                      <span className="text-slate-400 font-mono text-[10px]">{model.credits} Pass</span>
                     </div>
                   </button>
                 );
@@ -373,12 +376,12 @@ export default function EbookStudio({ onOpenPayment, onOpenReader, onSaveBook, u
                   <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">
                     Chapter Count: <span className="text-indigo-400 font-bold">{chapterCount}</span>
                   </label>
-                  <span className="text-xs text-slate-500 font-mono">3 to 10 Chapters</span>
+                  <span className="text-xs text-slate-500 font-mono">3 to 8 Chapters</span>
                 </div>
                 <input
                   type="range"
                   min={3}
-                  max={10}
+                  max={8}
                   step={1}
                   value={chapterCount}
                   onChange={(e) => setChapterCount(parseInt(e.target.value, 10))}
@@ -406,7 +409,7 @@ export default function EbookStudio({ onOpenPayment, onOpenReader, onSaveBook, u
             <div className="pt-4 flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="text-xs text-slate-400 flex items-center gap-2">
                 <Shield className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-                <span>Powered by {activeModel.name}. Includes 3D Cover, Kindle EPUB &amp; PDF.</span>
+                <span>Powered by {activeModel.name}. Generates Table of Contents, 3D Cover &amp; Chapters.</span>
               </div>
 
               <button
@@ -417,7 +420,7 @@ export default function EbookStudio({ onOpenPayment, onOpenReader, onSaveBook, u
                 {isOutlineLoading ? (
                   <>
                     <RefreshCw className="w-4 h-4 animate-spin text-white" />
-                    <span>Synthesizing Structure with {activeModel.name}...</span>
+                    <span>Synthesizing Outline with {activeModel.name}...</span>
                   </>
                 ) : (
                   <>
@@ -431,14 +434,14 @@ export default function EbookStudio({ onOpenPayment, onOpenReader, onSaveBook, u
         </div>
       )}
 
-      {/* STEP 2: OUTLINE REVIEW */}
+      {/* STEP 2: OUTLINE REVIEW & START WRITING */}
       {step === 'outline' && currentBook && (
         <div className="glass-panel-glow rounded-2xl p-6 sm:p-8 space-y-6 animate-fadeIn">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
             <div>
               <div className="text-xs font-bold text-orange-400 tracking-wider uppercase flex items-center gap-1.5">
                 <span>{activeModel.name}</span>
-                <span>• Outline Preview</span>
+                <span>• Outline Generated</span>
               </div>
               <h2 className="text-2xl font-black text-white mt-0.5">{currentBook.title}</h2>
               <p className="text-xs text-slate-400">{currentBook.subtitle}</p>
@@ -446,13 +449,13 @@ export default function EbookStudio({ onOpenPayment, onOpenReader, onSaveBook, u
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setStep('brief')}
-                className="px-3 py-1.5 rounded-lg border border-slate-700 text-xs font-medium text-slate-300 hover:bg-slate-800 transition"
+                className="px-3 py-1.5 rounded-lg border border-slate-700 text-xs font-medium text-slate-300 hover:bg-slate-800 transition cursor-pointer"
               >
-                &larr; Change Model / Brief
+                &larr; Back to Brief
               </button>
               <button
                 onClick={handleAddChapter}
-                className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-indigo-300 flex items-center gap-1 border border-indigo-500/30 transition"
+                className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-indigo-300 flex items-center gap-1 border border-indigo-500/30 transition cursor-pointer"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>Add Chapter</span>
@@ -494,7 +497,7 @@ export default function EbookStudio({ onOpenPayment, onOpenReader, onSaveBook, u
                 <button
                   type="button"
                   onClick={() => handleRemoveChapter(idx)}
-                  className="opacity-40 group-hover:opacity-100 text-rose-400 hover:text-rose-300 p-1.5 rounded hover:bg-rose-500/10 transition"
+                  className="opacity-40 group-hover:opacity-100 text-rose-400 hover:text-rose-300 p-1.5 rounded hover:bg-rose-500/10 transition cursor-pointer"
                   title="Remove Chapter"
                 >
                   <Trash2 className="w-4 h-4" />
@@ -508,7 +511,7 @@ export default function EbookStudio({ onOpenPayment, onOpenReader, onSaveBook, u
             <div className="text-xs text-slate-400 flex items-center gap-2">
               <Clock className="w-4 h-4 text-amber-400" />
               <span>
-                Total: {currentBook.chapters.length} Chapters (~{currentBook.chapters.length * 1200} words)
+                Ready to write {currentBook.chapters.length} Chapters (~{currentBook.chapters.length * 1200} words)
               </span>
             </div>
 
@@ -517,7 +520,7 @@ export default function EbookStudio({ onOpenPayment, onOpenReader, onSaveBook, u
               className="w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-emerald-600 via-teal-600 to-indigo-600 hover:from-emerald-500 hover:to-indigo-500 text-white font-bold rounded-xl shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2 text-sm transition cursor-pointer"
             >
               <Sparkles className="w-4 h-4 text-amber-300" />
-              <span>Write Full Book with {activeModel.name} ({activeModel.credits} Credit{activeModel.credits > 1 ? 's' : ''})</span>
+              <span>Write Full Book with AI Now &rarr;</span>
             </button>
           </div>
         </div>
@@ -557,7 +560,7 @@ export default function EbookStudio({ onOpenPayment, onOpenReader, onSaveBook, u
           <div className="text-center">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-bold border border-emerald-500/30 mb-2">
               <CheckCircle className="w-3.5 h-3.5" />
-              <span>Full Book Generated by {currentBook.modelUsed || activeModel.name}</span>
+              <span>Book Written Successfully by {currentBook.modelUsed || activeModel.name}</span>
             </div>
             <h2 className="text-3xl font-black text-white">{currentBook.title}</h2>
             <p className="text-sm text-slate-400 mt-1">{currentBook.subtitle}</p>
@@ -592,7 +595,7 @@ export default function EbookStudio({ onOpenPayment, onOpenReader, onSaveBook, u
                     <button
                       key={preset.id}
                       onClick={() => setSelectedCoverPreset(preset.id)}
-                      className={`p-2.5 rounded-xl border text-xs font-semibold text-left transition ${
+                      className={`p-2.5 rounded-xl border text-xs font-semibold text-left transition cursor-pointer ${
                         selectedCoverPreset === preset.id
                           ? 'border-indigo-500 bg-indigo-600/20 text-white'
                           : 'border-slate-800 bg-slate-900/60 text-slate-400 hover:border-slate-700'
@@ -631,7 +634,7 @@ export default function EbookStudio({ onOpenPayment, onOpenReader, onSaveBook, u
                 <div className="flex gap-2">
                   <button
                     onClick={() => onOpenReader(currentBook)}
-                    className="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-lg border border-slate-700 transition flex items-center justify-center gap-1.5"
+                    className="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-lg border border-slate-700 transition flex items-center justify-center gap-1.5 cursor-pointer"
                   >
                     <Download className="w-3.5 h-3.5 text-indigo-400" />
                     <span>Export PDF &amp; EPUB</span>
@@ -641,7 +644,7 @@ export default function EbookStudio({ onOpenPayment, onOpenReader, onSaveBook, u
                       setStep('brief');
                       setCurrentBook(null);
                     }}
-                    className="py-2.5 px-4 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium rounded-lg border border-slate-700 transition"
+                    className="py-2.5 px-4 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium rounded-lg border border-slate-700 transition cursor-pointer"
                   >
                     Create Another Book
                   </button>

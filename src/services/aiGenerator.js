@@ -1,6 +1,4 @@
 // Ebook On Your Demand — Multi-Model AI Authoring Engine
-// Supports Antigravity Neural Writer, Claude 3.5 Sonnet, and OpenAI Codex/GPT-4o
-
 import { api } from './api';
 
 export const AI_WRITER_MODELS = [
@@ -8,11 +6,10 @@ export const AI_WRITER_MODELS = [
     id: 'antigravity',
     name: 'Antigravity Neural Writer (AGY-v2)',
     badge: 'DEFAULT • FASTEST',
-    costInr: 149,
-    costUsd: 1.99,
+    priceUsd: 1.99,
+    originalPriceUsd: 4.99,
     credits: 1,
     tagline: 'High-speed conceptual flow, engaging narrative hooks, and rapid chapter synthesis.',
-    toneStyle: 'Dynamic, modern, punchy, and deeply inspiring.',
     color: 'from-indigo-500 to-purple-600',
     borderColor: 'border-indigo-500',
     icon: '⚡'
@@ -21,11 +18,10 @@ export const AI_WRITER_MODELS = [
     id: 'claude',
     name: 'Claude 3.5 Sonnet Engine',
     badge: 'BEST PROSE',
-    costInr: 249,
-    costUsd: 3.49,
+    priceUsd: 3.49,
+    originalPriceUsd: 8.99,
     credits: 2,
     tagline: 'Nuanced storytelling, elegant literary articulation, and deep philosophical clarity.',
-    toneStyle: 'Thoughtful, articulate, layered, and authoritative.',
     color: 'from-amber-500 to-rose-600',
     borderColor: 'border-amber-500',
     icon: '🧠'
@@ -34,11 +30,10 @@ export const AI_WRITER_MODELS = [
     id: 'codex',
     name: 'OpenAI Codex / GPT-4o Pro',
     badge: 'TECHNICAL & CODE',
-    costInr: 349,
-    costUsd: 4.99,
+    priceUsd: 4.99,
+    originalPriceUsd: 12.99,
     credits: 3,
     tagline: 'Rigorous analytical frameworks, technical checklists, business models, and code.',
-    toneStyle: 'Systematic, empirical, data-driven, and highly structured.',
     color: 'from-emerald-500 to-teal-600',
     borderColor: 'border-emerald-500',
     icon: '⚙️'
@@ -47,11 +42,10 @@ export const AI_WRITER_MODELS = [
     id: 'ensemble',
     name: 'Multi-Agent Trio (Antigravity + Claude + Codex)',
     badge: 'ULTIMATE BESTSELLER',
-    costInr: 499,
-    costUsd: 6.99,
+    priceUsd: 6.99,
+    originalPriceUsd: 19.99,
     credits: 4,
     tagline: 'Collaborative pipeline: Antigravity outlines, Claude writes prose, Codex reviews frameworks.',
-    toneStyle: 'Full commercial-grade masterclass with exhaustive depth.',
     color: 'from-fuchsia-600 to-cyan-500',
     borderColor: 'border-fuchsia-500',
     icon: '👑'
@@ -100,7 +94,7 @@ export async function generateBookOutline({
   tone,
   chapterCount = 5,
   language = 'English',
-  author = 'Author',
+  author = 'Sabhyam Trivedy',
   modelId = 'antigravity'
 }) {
   // 1. Try Backend Server API first
@@ -120,12 +114,12 @@ export async function generateBookOutline({
     return backendRes.data;
   }
 
-  // 2. Client-side synthesis fallback
-  await new Promise(r => setTimeout(r, 700));
+  // 2. High-speed client-side synthesis
+  await new Promise(r => setTimeout(r, 600));
 
-  const safeTopic = topic || title || 'The Modern Playbook for Financial and Creative Sovereignty';
-  const cleanTitle = title || `The ${safeTopic.replace(/^(the|a|an)\s+/i, '')} Codex: On Demand`;
-  const cleanSubtitle = `How ${audience || 'ambitious builders'} can dominate the new landscape`;
+  const safeTopic = topic || title || 'The Modern Playbook for Exponential Growth';
+  const cleanTitle = title || `The ${safeTopic.replace(/^(the|a|an)\s+/i, '')} Codex`;
+  const cleanSubtitle = `Actionable frameworks, blueprints, and mastery for ${audience || 'ambitious builders'}`;
 
   const selectedModel = AI_WRITER_MODELS.find(m => m.id === modelId) || AI_WRITER_MODELS[0];
 
@@ -200,7 +194,7 @@ export async function generateChapterContent({
     return backendRes.content;
   }
 
-  await new Promise(r => setTimeout(r, 600));
+  await new Promise(r => setTimeout(r, 500));
 
   const model = AI_WRITER_MODELS.find(m => m.id === modelId) || AI_WRITER_MODELS[0];
 
@@ -217,7 +211,7 @@ export async function generateChapterContent({
 
   const content = `
 > *"True leverage is not the accumulation of noise; it is the quiet courage to distill truth into decisive daily action."*  
-> — **${author || 'Ebook On Your Demand'}**
+> — **${author || 'Sabhyam Trivedy'}**
 
 ---
 

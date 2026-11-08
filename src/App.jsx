@@ -5,6 +5,7 @@ import PricingSection from './components/PricingSection';
 import BookLibrary from './components/BookLibrary';
 import PaymentModal from './components/PaymentModal';
 import UniversalAuthModal from './components/UniversalAuthModal';
+import WhopRedeemModal from './components/WhopRedeemModal';
 import BookReaderModal from './components/BookReaderModal';
 import Footer from './components/Footer';
 
@@ -19,6 +20,7 @@ export default function App() {
   // Modals
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [isPaymentOpen, setIsPaymentOpen] = useState(false);
+  const [isWhopRedeemOpen, setIsWhopRedeemOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState(PRICING_PLANS[1]);
   const [isReaderOpen, setIsReaderOpen] = useState(false);
   const [activeBook, setActiveBook] = useState(null);
@@ -81,7 +83,12 @@ export default function App() {
   };
 
   const handleScrollToStudio = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    const el = document.getElementById('studio-section');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   };
 
   return (
@@ -92,6 +99,7 @@ export default function App() {
         credits={credits}
         onOpenUniversalAuth={() => setIsAuthOpen(true)}
         onOpenPayment={() => handleOpenPayment(PRICING_PLANS[1])}
+        onOpenWhopRedeem={() => setIsWhopRedeemOpen(true)}
         onSignOut={handleSignOut}
         onStartNew={handleScrollToStudio}
       />
@@ -132,6 +140,13 @@ export default function App() {
         isOpen={isAuthOpen}
         onClose={() => setIsAuthOpen(false)}
         onLoginSuccess={(u) => setUser(u)}
+      />
+
+      <WhopRedeemModal
+        isOpen={isWhopRedeemOpen}
+        onClose={() => setIsWhopRedeemOpen(false)}
+        user={user}
+        onRedeemSuccess={() => setCredits(getUserCredits())}
       />
 
       <BookReaderModal

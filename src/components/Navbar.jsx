@@ -7,7 +7,8 @@ import {
   LogOut,
   ChevronDown,
   ShoppingBag,
-  ExternalLink
+  ExternalLink,
+  Key
 } from 'lucide-react';
 import { WHOP_CONFIG } from '../services/paymentService';
 
@@ -16,6 +17,7 @@ export default function Navbar({
   credits,
   onOpenUniversalAuth,
   onOpenPayment,
+  onOpenWhopRedeem,
   onSignOut,
   onStartNew
 }) {
@@ -39,19 +41,19 @@ export default function Navbar({
               </span>
             </div>
             <p className="text-[10px] text-slate-400 font-medium hidden sm:block">
-              Antigravity • Claude 3.5 Sonnet • Codex
+              Antigravity &bull; Claude 3.5 Sonnet &bull; Codex AI
             </p>
           </div>
         </div>
 
         {/* Center Navigation Links */}
         <nav className="hidden md:flex items-center gap-6 text-xs font-semibold text-slate-300">
-          <a href="#" onClick={onStartNew} className="hover:text-white transition">
+          <a href="#studio-section" onClick={onStartNew} className="hover:text-white transition">
             AI Writer Studio
           </a>
           <a href="#pricing" className="hover:text-white transition flex items-center gap-1">
-            <span>UPI Pricing</span>
-            <span className="text-[10px] bg-emerald-500/20 text-emerald-400 px-1 rounded font-mono">₹149+</span>
+            <span>Passes &amp; Pricing</span>
+            <span className="text-[10px] bg-emerald-500/20 text-emerald-400 px-1 rounded font-mono">$1.99+</span>
           </a>
           <a
             href={WHOP_CONFIG.storeUrl}
@@ -60,9 +62,17 @@ export default function Navbar({
             className="hover:text-orange-400 transition flex items-center gap-1 text-orange-400/90"
           >
             <ShoppingBag className="w-3.5 h-3.5" />
-            <span>Whop Store</span>
+            <span>Whop Shop</span>
             <ExternalLink className="w-2.5 h-2.5" />
           </a>
+          <button
+            type="button"
+            onClick={onOpenWhopRedeem}
+            className="hover:text-amber-300 transition flex items-center gap-1 text-slate-300 cursor-pointer"
+          >
+            <Key className="w-3 h-3 text-amber-400" />
+            <span>Redeem Whop Pass</span>
+          </button>
           <a href="#library" className="hover:text-white transition">
             Showcase Books
           </a>
@@ -72,15 +82,15 @@ export default function Navbar({
         <div className="flex items-center gap-2 sm:gap-3">
           {/* Credit balance badge */}
           <button
-            onClick={() => onOpenPayment()}
+            onClick={onOpenPayment}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700/80 hover:border-indigo-500/60 text-xs transition cursor-pointer shadow-sm group"
-            title="Click to recharge credits via UPI or Whop"
+            title="Click to recharge credits via Whop or UPI"
           >
             <Zap className="w-3.5 h-3.5 text-amber-400 group-hover:scale-110 transition" />
             <span className="font-bold text-white font-mono">{credits}</span>
             <span className="text-slate-400 hidden sm:inline">Pass{credits !== 1 ? 'es' : ''}</span>
-            <span className="text-[10px] bg-indigo-500/20 text-indigo-300 px-1.5 py-0.2 rounded font-semibold ml-0.5">
-              + Topup
+            <span className="text-[10px] bg-orange-500/20 text-orange-300 px-1.5 py-0.2 rounded font-semibold ml-0.5">
+              + Add
             </span>
           </button>
 
@@ -89,7 +99,7 @@ export default function Navbar({
             <div className="relative">
               <button
                 onClick={() => setProfileDropdown(!profileDropdown)}
-                className="flex items-center gap-2 p-1 pl-2 bg-slate-900 hover:bg-slate-850 border border-slate-700 rounded-full transition"
+                className="flex items-center gap-2 p-1 pl-2 bg-slate-900 hover:bg-slate-850 border border-slate-700 rounded-full transition cursor-pointer"
               >
                 <img
                   src={user.avatar || 'https://api.dicebear.com/7.x/identicon/svg?seed=User'}
@@ -121,7 +131,17 @@ export default function Navbar({
                     </div>
                   </div>
 
-                  <div className="pt-2 border-t border-slate-800">
+                  <div className="pt-2 border-t border-slate-800 space-y-1">
+                    <button
+                      onClick={() => {
+                        setProfileDropdown(false);
+                        onOpenWhopRedeem();
+                      }}
+                      className="w-full py-1 text-left text-orange-400 hover:text-orange-300 flex items-center gap-1.5"
+                    >
+                      <Key className="w-3.5 h-3.5" />
+                      <span>Redeem Whop License</span>
+                    </button>
                     <button
                       onClick={() => {
                         setProfileDropdown(false);
