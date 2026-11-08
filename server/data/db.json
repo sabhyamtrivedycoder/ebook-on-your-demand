@@ -1,0 +1,56 @@
+{
+  "users": [
+    {
+      "id": "user-sabhyam-founder",
+      "name": "Sabhyam Trivedy",
+      "email": "sabhyamtrivedy@gmail.com",
+      "phone": "+919876543210",
+      "passwordHash": "$2a$10$wT0vR7sCq/YJzI6Z8L4z..Z8L4z..Z8L4z..Z8L4z..",
+      "credits": 16,
+      "role": "owner",
+      "provider": "google",
+      "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+      "createdAt": "2026-11-08T13:57:16.544Z"
+    },
+    {
+      "id": "whop-user-1794146317986",
+      "name": "customer",
+      "email": "customer@whop.com",
+      "credits": 8,
+      "role": "whop_member",
+      "provider": "whop",
+      "createdAt": "2026-11-08T13:58:37.986Z"
+    }
+  ],
+  "orders": [
+    {
+      "id": "whop-1794146317988",
+      "orderId": "WHOP-317988",
+      "userEmail": "customer@whop.com",
+      "planId": "whop_pass",
+      "amount": 6.99,
+      "credits": 5,
+      "provider": "WHOP",
+      "status": "PAID",
+      "createdAt": "2026-11-08T13:58:37.988Z"
+    },
+    {
+      "id": "ord-1794146298940",
+      "orderId": "EOYD-298940",
+      "userId": "user-sabhyam-founder",
+      "userEmail": "sabhyamtrivedy@gmail.com",
+      "planId": "pro",
+      "planName": "Claude Masterclass",
+      "amount": 249,
+      "credits": 1,
+      "utr": "431289012345",
+      "payee": "Guddi Trivedi",
+      "upiId": "gudditrivedy@oksbi",
+      "provider": "UPI_SBI",
+      "status": "VERIFIED",
+      "createdAt": "2026-11-08T13:58:18.940Z"
+    }
+  ],
+  "books": [],
+  "otps": {}
+}

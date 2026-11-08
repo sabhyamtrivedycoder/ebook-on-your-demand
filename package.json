@@ -1,16 +1,23 @@
 {
-  "name": "ebook-writer-ondemand",
-  "version": "1.0.0",
-  "description": "On-Demand AI eBook Writing & Publishing Platform with UPI & Google Auth",
+  "name": "ebook-on-your-demand",
+  "version": "2.0.0",
+  "description": "Ebook On Your Demand — On-Demand AI eBook Authoring, 3D Covers, Firebase Universal Login, UPI & Whop Payments",
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "server": "node server/index.js",
+    "start": "node server/index.js",
     "build": "vite build",
     "preview": "vite preview"
   },
   "dependencies": {
+    "bcryptjs": "^3.0.3",
     "canvas-confetti": "^1.9.4",
-    "firebase": "^13.2.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "firebase": "^12.12.0",
+    "jsonwebtoken": "^9.0.3",
     "jspdf": "^4.2.1",
     "jszip": "^3.10.2",
     "lucide-react": "^1.70.0",

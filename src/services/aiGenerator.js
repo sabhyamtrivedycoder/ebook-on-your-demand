@@ -1,6 +1,8 @@
 // Ebook On Your Demand — Multi-Model AI Authoring Engine
 // Supports Antigravity Neural Writer, Claude 3.5 Sonnet, and OpenAI Codex/GPT-4o
 
+import { api } from './api';
+
 export const AI_WRITER_MODELS = [
   {
     id: 'antigravity',
@@ -101,6 +103,24 @@ export async function generateBookOutline({
   author = 'Author',
   modelId = 'antigravity'
 }) {
+  // 1. Try Backend Server API first
+  const backendRes = await api.generateOutline({
+    title,
+    topic,
+    genre,
+    audience,
+    tone,
+    chapterCount,
+    language,
+    author,
+    modelId
+  });
+
+  if (backendRes && backendRes.success && backendRes.data) {
+    return backendRes.data;
+  }
+
+  // 2. Client-side synthesis fallback
   await new Promise(r => setTimeout(r, 700));
 
   const safeTopic = topic || title || 'The Modern Playbook for Financial and Creative Sovereignty';
@@ -162,6 +182,24 @@ export async function generateChapterContent({
   language = 'English',
   modelId = 'antigravity'
 }) {
+  // 1. Try Backend Server API first
+  const backendRes = await api.generateChapter({
+    bookTitle,
+    chapterNumber,
+    chapterTitle,
+    chapterSummary,
+    genre,
+    tone,
+    audience,
+    author,
+    language,
+    modelId
+  });
+
+  if (backendRes && backendRes.success && backendRes.content) {
+    return backendRes.content;
+  }
+
   await new Promise(r => setTimeout(r, 600));
 
   const model = AI_WRITER_MODELS.find(m => m.id === modelId) || AI_WRITER_MODELS[0];
