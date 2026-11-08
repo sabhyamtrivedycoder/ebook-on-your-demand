@@ -90,6 +90,46 @@ router.post('/chapter', async (req, res) => {
     if (modelId === 'codex') modelSignature = 'OpenAI Codex / GPT-4o Pro';
     if (modelId === 'ensemble') modelSignature = 'Multi-Agent Ensemble Trio';
 
+    // If Google Gemini API key exists, call Gemini API
+    const geminiKey = CONFIG.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || '';
+    if (geminiKey) {
+      try {
+        const geminiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{
+              parts: [{
+                text: `You are an elite bestselling author (${modelSignature}). Write a deep, highly articulate chapter in Markdown with quotes, frameworks, and practical exercises.
+
+Book: "${bookTitle}"
+Chapter ${chapterNumber}: "${chapterTitle}"
+Summary: "${chapterSummary}"
+Audience: "${audience}"
+Tone: "${tone}"
+Language: "${language}"
+Author: "${author}"`
+              }]
+            }],
+            generationConfig: {
+              temperature: 0.7,
+              maxOutputTokens: 2500
+            }
+          })
+        });
+
+        if (geminiRes.ok) {
+          const geminiData = await geminiRes.json();
+          const generatedText = geminiData.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (generatedText) {
+            return res.json({ success: true, content: generatedText, modelSignature: `${modelSignature} (Gemini)` });
+          }
+        }
+      } catch (geminiErr) {
+        console.warn('Backend Gemini call failed, continuing to alternate engine:', geminiErr.message);
+      }
+    }
+
     // If real OpenAI API key exists, call OpenAI API
     if (CONFIG.OPENAI_API_KEY && (modelId === 'codex' || modelId === 'ensemble')) {
       try {

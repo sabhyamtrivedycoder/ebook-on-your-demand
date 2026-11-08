@@ -57,11 +57,11 @@ app.use((req, res, next) => {
 // Start Server
 app.listen(CONFIG.PORT, () => {
   console.log(`=======================================================`);
-  console.log(`🚀 Ebook On Your Demand Backend API running on port ${CONFIG.PORT}`);
-  console.log(`🔗 Local URL: http://localhost:${CONFIG.PORT}`);
-  console.log(`📡 Health Check: http://localhost:${CONFIG.PORT}/api/health`);
-  console.log(`💼 Support Email: ${CONFIG.UPI.supportEmail}`);
-  console.log(`💳 UPI VPA: ${CONFIG.UPI.vpa}`);
-  console.log(`🛍️ Whop Webhook: http://localhost:${CONFIG.PORT}/api/payments/whop-webhook`);
+  console.log(`Ebook On Your Demand Backend API running on port ${CONFIG.PORT}`);
+  console.log(`Local URL: http://localhost:${CONFIG.PORT}`);
+  console.log(`Health Check: http://localhost:${CONFIG.PORT}/api/health`);
+  console.log(`Support Email: ${CONFIG.UPI.supportEmail}`);
+  console.log(`UPI VPA: ${CONFIG.UPI.vpa}`);
+  console.log(`Whop Webhook: http://localhost:${CONFIG.PORT}/api/payments/whop-webhook`);
   console.log(`=======================================================`);
 });
